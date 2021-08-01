@@ -7,18 +7,20 @@ const axios=require('axios')
 require('dotenv').config()
 const server=express()
 server.use(cors());
+server.use(express.json())
 const PORT=process.env.PORT
 mongoose.connect('mongodb://localhost:27017/testExam', {useNewUrlParser: true, useUnifiedTopology: true});
 
-const GamSchema= new mongoose.Schema({
-    name:String,
-    typeGam:String
+const MovieSchema= new mongoose.Schema({
+    image_url:String,
+    title:String
+    
 })
 const ownerSchema= new mongoose.Schema({
     email:String,
-    Gam:[GamSchema]
+    movie:[MovieSchema]
 })
-const GamModel=mongoose.model('game',GamSchema)
+const GamModel=mongoose.model('Movie',MovieSchema)
 const ownerModel=mongoose.model('owner',ownerSchema)
 
 
@@ -30,30 +32,28 @@ server.listen(PORT,()=>{
 function seedData (){
     const eman= new ownerModel({
         email:'emkhareez19@gmail.com',
-        Gam:[
+        movie:[
             {
-                name:"barbie",
-                typeGam:"giral"
+                image_url:"https://image.tmdb.org/t/p/w500/pNrQaH0ATrz9wFrNpwfB1aU4MpK.jpg",
+
+                title:"giral"
                  
-            },
-            {
-                name:'strawberry',
-                typeGam:"giral"
             }
+           
         ]
 
     })
 
-    const Razan=new ownerModel({
-        email:'razan@.com',
-        Gam:[{
-            name:"Fulla gam",
-            typeGam:"giral"
+    // const Razan=new ownerModel({
+    //     email:'razan@.com',
+    //     Gam:[{
+    //         name:"Fulla gam",
+    //         typeGam:"giral"
 
-        }]
-    })
+    //     }]
+    // })
 
-    Razan.save()
+    // Razan.save()
     eman.save()
   
 
@@ -64,11 +64,21 @@ function seedData (){
 //  http://localhost:3001/game?email=emkhareez19@gmail.com
 server.get('/game',GAMEDATA)
 
-// https://api.themoviedb.org/3/search/movie?api_key=bec06652a4cb9591d54fceb6bc996e54&type=Action
-server.get('/movies',getDataFromMovies)
+// https://api.themoviedb.org/3/search/movie?api_key=bec06652a4cb9591d54fceb6bc996e54&query=Action
+
 // http://localhost:3001/movies?api_key=bec06652a4cb9591d54fceb6bc996e54&=Action
-//http://localhost:3001/addMovies?api_key=bec06652a4cb9591d54fceb6bc996e54&=Action
-server.post('/addMovies/:email',AddHandeler)
+server.get('/movies',getDataFromMovies)
+
+//http://localhost:3001/addMovies?api_key=bec06652a4cb9591d54fceb6bc996e54&query=Action
+server.post('/addMovies',AddHandeler)
+http://localhost:3001/getData/:email
+server.get('/GetFavData',GetHandeler)
+server.delete('/delData/:id',deleteHandeling)
+
+//http:localhost3001/UpdateFun/1
+server.put('/UpdateFun/:index',HandelingUpdate)
+
+
 
 function GAMEDATA(req,res){
     const userEmail=req.query.email
@@ -115,22 +125,153 @@ let movieResult=[]
  }
 
 function AddHandeler(req,res){
-console.log('dfbbbbbb',req.body);
-    // let userEmail=req.params.email
-    // let {}
-    
+//  let{image_url,title}=req.body
+console.log('fffffffffff',req.query)
+ console.log('ddddd',req.body)
+ let userEmail=req.query.email
+ let {image_url,title}=req.body
+ 
+ ownerModel.find({email:userEmail},(error,result)=>{
+     if(error){
+         res.send(error)
+     }
+     else{
+         result[0].movie.push({
+            image_url:image_url,
+             title:title
+
+
+             
+         })
+        
+        //  console.log('nbvcxz',movie);
+        
+         result[0].save()
+         res.send(result[0].movie)
+         console.log('resulttttttttttttttt',result[0].movie)
+     }
+     
+ })
 }
+
+
+ function GetHandeler(req,res){
+    let  email=req.query.email
+     console.log('hgfdsdfghjkjhgfd',email)
+     ownerModel.find({email:email},(error,result)=>{
+         if(error){
+             res.send(error)
+         }
+         else{
+             res.send(result[0].movie)
+         }
+     })
+
+ }
+
+function deleteHandeling(req,res){
+    console.log('gggggg',req.params)
+    console.log('bbbbbbbbbbb',req.query)
+    let id=Number(req.params.id)
+    let email=req.query.email
+    console.log('idddd',id);
+    ownerModel.find({email:email},(error,data)=>{
+        if(error){
+            res.send(error)
+        }
+      else{
+        let dataAfterDel=data[0].movie.filter((item,index)=>{
+            return index!==id
+        })
+        data[0].movie=dataAfterDel
+        console.log('data after del',data[0].movie)
+        data[0].save()
+        res.send(data[0].movie)
+    }
+    })
+
+}
+function HandelingUpdate(req,res){
+    console.log('params',req.params)
+    console.log('body',req.body)
+    let index=Number(req.params.index)
+    let {email, image_url,title}=req.body
+    ownerModel.find({email:email},(error,updateData)=>{
+        if(error){
+            res.send('not found')
+        }
+        else{
+            //one way
+            // updateData[0].movie[index].image_url=image_url
+            // updateData[0].movie[index].title=title
+
+           // anotherWay
+           updateData[0].movie.splice(index,1,{
+            image_url:image_url,
+            title:title
+           })
+        }
+        console.log(updateData[0])
+        updateData[0].save()
+        res.send(updateData[0].movie)
+
+
+    })
+}
+
+
+
+
+// //addBookHandelr
+// function addBookHandelr(req, res) {
+//     console.log(req.body)
+
+//     let { name, description, status, Email, img } = req.body
+
+//     console.log(Email)
+//     UserModel.find({ email: Email }, (error, bookData) => {
+//         if (error) {
+//             res.send(error, 'no user')
+//         }
+//         else {
+//             console.log(bookData[0].books)
+//             bookData[0].books.push({
+//                 name: name,
+//                 description: description,
+//                 status: status,
+//                 img: img
+
+
+
+
+//             })
+//             console.log('after adding', bookData[0])
+//             bookData[0].save()
+//             res.send(bookData[0].books)
+
+//         }
+//     })
+
+
+
+// }
+
+
+
+
+
+
+
+
+
+
+
+
  class Movie {
     constructor(item) {
         this.title = item.title;
-        this.overview = item.overview;
-        this.average_votes = item.vote_average;
-
-        this.total_votes = item.vote_count;
         this.image_url = `https://image.tmdb.org/t/p/w500${item.poster_path}`;
-        this.popularity = item.popularity;
-        this.released_on = item.release_date;
-        // movieResult.push(this)
+        
     }
 }
  
