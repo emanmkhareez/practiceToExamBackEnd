@@ -16,7 +16,7 @@ const PORT=process.env.PORT
 //   useUnifiedTopology: true,
 // });
 
-mongoose.connect(`${process.env.dbatls}`, {
+mongoose.connect(`${process.env.DB_ATLS}`, {
     useNewUrlParser: true, useUnifiedTopology: true});
 
 const MovieSchema= new mongoose.Schema({
