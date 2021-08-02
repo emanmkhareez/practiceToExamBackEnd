@@ -9,7 +9,7 @@ const server=express()
 server.use(cors());
 server.use(express.json())
 const PORT=process.env.PORT
-mongoose.connect('mongodb://emanmkhareez:eman12345@cluster0-shard-00-00.2xoym.mongodb.net:27017,cluster0-shard-00-01.2xoym.mongodb.net:27017,cluster0-shard-00-02.2xoym.mongodb.net:27017/examdb?ssl=true&replicaSet=atlas-zeqdyo-shard-0&authSource=admin&retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://emanmkhareez:eman12345@cluster0-shard-00-00.2xoym.mongodb.net:27017,cluster0-shard-00-01.2xoym.mongodb.net:27017,cluster0-shard-00-02.2xoym.mongodb.net:27017/testExam?ssl=true&replicaSet=atlas-zeqdyo-shard-0&authSource=admin&retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true});
 
 const MovieSchema= new mongoose.Schema({
     image_url:String,
