@@ -9,7 +9,15 @@ const server=express()
 server.use(cors());
 server.use(express.json())
 const PORT=process.env.PORT
-mongoose.connect(`${process.env.dbatls}`, {useNewUrlParser: true, useUnifiedTopology: true});
+
+
+// mongoose.connect('mongodb://localhost:27017/testExam', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// });
+
+mongoose.connect(`${process.env.dbatls}`, {
+    useNewUrlParser: true, useUnifiedTopology: true});
 
 const MovieSchema= new mongoose.Schema({
     image_url:String,
@@ -20,7 +28,7 @@ const ownerSchema= new mongoose.Schema({
     email:String,
     movie:[MovieSchema]
 })
-const GamModel=mongoose.model('Movie',MovieSchema)
+const Moviemodel=mongoose.model('Movie',MovieSchema)
 const ownerModel=mongoose.model('owner',ownerSchema)
 
 
@@ -218,51 +226,6 @@ function HandelingUpdate(req,res){
 
     })
 }
-
-
-
-
-// //addBookHandelr
-// function addBookHandelr(req, res) {
-//     console.log(req.body)
-
-//     let { name, description, status, Email, img } = req.body
-
-//     console.log(Email)
-//     UserModel.find({ email: Email }, (error, bookData) => {
-//         if (error) {
-//             res.send(error, 'no user')
-//         }
-//         else {
-//             console.log(bookData[0].books)
-//             bookData[0].books.push({
-//                 name: name,
-//                 description: description,
-//                 status: status,
-//                 img: img
-
-
-
-
-//             })
-//             console.log('after adding', bookData[0])
-//             bookData[0].save()
-//             res.send(bookData[0].books)
-
-//         }
-//     })
-
-
-
-// }
-
-
-
-
-
-
-
-
 
 
 
